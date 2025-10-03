@@ -2,7 +2,7 @@ import random
 
 class Gridworld( object ):
 
-    def __init__( self ):
+    def __init__( self, goal=1, penalty=-1 ):
         """ 
         Constructor for the 3x4 Gridworld environment with slip dynamics.
         The state is represented as (row, column) tuples, where (0,0) is the bottom-left corner. 
@@ -19,6 +19,8 @@ class Gridworld( object ):
         self.wall_state = ( 1, 1 )
         self.goal_state = ( 2, 3 )
         self.penalty_state = ( 1, 3 )
+        self.goal_reward = goal
+        self.penalty_reward = penalty
 
         self.state = self.start_state
 
@@ -66,10 +68,10 @@ class Gridworld( object ):
 
         # Reward and Done
         if next_state == self.goal_state:
-            reward = 1
+            reward = self.goal_reward
             done = True
         elif next_state ==  self.penalty_state:
-            reward = -1
+            reward = self.penalty_reward
             done = True
         else:
             reward = -0.04
