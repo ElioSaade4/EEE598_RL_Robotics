@@ -110,7 +110,7 @@ if __name__ == '__main__':
             # Evaluate the learned policy at regular intervals
             if ( episode + 1 ) % eval_interval == 0:
                 index = ( ( episode + 1 ) // eval_interval ) - 1
-                eval_result = evaluate_policy( agent, n_episodes=1, max_steps=max_steps )
+                eval_result = evaluate_policy( agent, n_episodes=10, max_steps=max_steps )
                 eval_rewards[ index ] = eval_result
 
             if (episode + 1 ) % 500 == 0:
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         agent.print_greedy_policy()
         print()
     
-    plt.title( 'DPQN Evaluation Curve - No Slip' )
+    plt.title( 'DQN Evaluation Curve - Slip' )
     plt.legend()
     plt.xlabel( 'Episode')
     plt.ylabel( 'Evaluation Reward' )
