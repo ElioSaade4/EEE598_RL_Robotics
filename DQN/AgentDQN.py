@@ -66,8 +66,7 @@ class AgentDQN():
         state = torch.FloatTensor( state.reshape( 1, -1 ) ).to( self.device )
 
         # Forward pass to get Q-values
-        with torch.no_grad():
-            q_values = self.q_network.forward( state ).cpu().data.numpy().flatten()
+        q_values = self.q_network.forward( state ).cpu().data.numpy().flatten()
 
         # Get the action with the highest Q-value
         greedy_action = np.argmax( q_values )
@@ -139,7 +138,11 @@ class AgentDQN():
         It shows the action with the highest Q-value for each state.
         """
         actions = [ 'up', 'right', 'down', 'left' ]
+        rows = [ 0, 0, 0, 0, 0.5, 0.5, 1, 1, 1 ]
+        cols = [ 0, 0.3333, 0.6667, 1, 0, 0.6667, 0, 0.3333, 0.6667 ]
+
         print( 'Greedy policy:' )
         for i in range( 9 ):
-            greedy_action = self.select_greedy_action( np.array( i ) )
-            print( f'    State { i }: { actions[ greedy_action ] }' )
+            state = [ rows[i], cols[i] ]
+            greedy_action = self.select_greedy_action( np.array( state ) )
+            print( f'    State { state }: { actions[ greedy_action ] }' )

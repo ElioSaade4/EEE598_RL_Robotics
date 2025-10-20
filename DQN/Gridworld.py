@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 class Gridworld( object ):
 
@@ -15,10 +16,10 @@ class Gridworld( object ):
         """
         self.n_rows = 3
         self.n_columns = 4
-        self.start_state = ( 0, 0 )
-        self.wall_state = ( 1, 1 )
-        self.goal_state = ( 2, 3 )
-        self.penalty_state = ( 1, 3 )
+        self.start_state = np.array( [ 0, 0 ] )
+        self.wall_state = np.array( [ 1, 1 ] )
+        self.goal_state = np.array( [ 2, 3 ] )
+        self.penalty_state = np.array( [ 1, 3 ] )
         self.goal_reward = goal
         self.penalty_reward = penalty
 
@@ -33,8 +34,8 @@ class Gridworld( object ):
             action ( int ): action to take (0: up, 1: right, 2: down, 3: left)
         
         Returns:
-            state ( tuple ): current state as (row, column)
-            next_state ( tuple ): next state as (row, column)
+            state ( list ): current state as [row, column]
+            next_state ( list ): next state as [row, column]
             reward ( float ): reward received after taking the action
             done ( bool ): whether the episode has ended
         """
@@ -54,23 +55,23 @@ class Gridworld( object ):
         # Determine next state
         match action:   
             case 0:     # Up
-                next_state = ( min( row + 1, self.n_rows - 1 ), col )
+                next_state = np.array( [ min( row + 1, self.n_rows - 1 ), col ] )
             case 1:    # Right
-                next_state = ( row, min( col  + 1, self.n_columns - 1 ) )
+                next_state = np.array( [ row, min( col  + 1, self.n_columns - 1 ) ] )
             case 2:   # Down
-                next_state = ( max( row - 1, 0 ), col )
+                next_state = np.array( [ max( row - 1, 0 ), col ] )
             case 3:    # Left
-                next_state = ( row, max( col - 1, 0 ) )
+                next_state = np.array( [ row, max( col - 1, 0 ) ] )
 
         # Check for wall
-        if next_state == self.wall_state:
+        if np.array_equal( next_state, self.wall_state ):
             next_state = state
 
         # Reward and Done
-        if next_state == self.goal_state:
+        if np.array_equal( next_state, self.goal_state ):
             reward = self.goal_reward
             done = True
-        elif next_state ==  self.penalty_state:
+        elif np.array_equal( next_state,  self.penalty_state ):
             reward = self.penalty_reward
             done = True
         else:
@@ -79,35 +80,12 @@ class Gridworld( object ):
 
         self.state = next_state
 
-        return self.stateToIndex( next_state ), reward, done
-    
+        # Normalize the returned next state to [0,1] range
+        normalized_next_state = next_state / np.array( [ self.n_rows - 1, self.n_columns - 1 ] )
 
-    def stateToIndex( self, state ):
-        """
-        Converts a (row, column) state representation to a single integer index.
+        return normalized_next_state, reward, done
 
-        Args:
-            state ( tuple ): current state as (row, column)
 
-        Returns:
-            index ( int ): index of the state between 0 and 24
-        """
-        row, col = state
-
-        match row:
-            case 0:
-                index = col
-            case 1:
-                if col == 0:
-                    index = 4
-                else:
-                    index = 5
-            case 2:
-                index = col + 6
-
-        return index
-
-    
     def reset( self ):
         """
         Resets the environment to the start state.
@@ -115,5 +93,7 @@ class Gridworld( object ):
         Returns:
             state ( tuple ): starting state as (row, column)
         """
+        # Reset state to start state
+        # No need to normalize because it's [0,0]
         self.state = self.start_state
-        return self.stateToIndex( self.state )
+        return self.state
