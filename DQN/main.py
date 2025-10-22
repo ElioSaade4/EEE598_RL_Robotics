@@ -66,7 +66,7 @@ if __name__ == '__main__':
         agent = AgentDQN( state_dim = 2, 
                           action_dim = 1, 
                           n_actions = 4,
-                          layer_size = 128, 
+                          layer_size = 64, 
                           lr = 0.001, 
                           gamma = 0.99, 
                           tau = 0.01, 
@@ -79,18 +79,21 @@ if __name__ == '__main__':
         training_rewards = np.zeros( n_episodes )   # rewards per training episode
         eval_rewards = np.zeros( n_episodes // eval_interval )  # average rewards per evaluation
 
+        trial_steps = 0
+
         for episode in range( n_episodes ):
             state = env.reset()
             episode_rewards = 0
             done = False
 
-            steps = 0
-            
-            while not done and steps < max_steps:
-                steps += 1
-                
-                # act randomly for the first 50 steps to populate replay buffer
-                if steps < 50:
+            episode_steps = 0
+
+            while not done and episode_steps < max_steps:
+                trial_steps += 1
+                episode_steps += 1
+
+                # act randomly for the first 100 steps to populate replay buffer
+                if trial_steps <= 100:
                     action = np.random.randint( 0, agent.n_actions )
                 else:
                     action = agent.select_action( state , 0.1 )
