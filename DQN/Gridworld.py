@@ -3,7 +3,7 @@ import numpy as np
 
 class Gridworld( object ):
 
-    def __init__( self, goal=1, penalty=-1 ):
+    def __init__( self, goal=1, penalty=-1, enable_slip=True ):
         """ 
         Constructor for the 3x4 Gridworld environment with slip dynamics.
         The state is represented as (row, column) tuples, where (0,0) is the bottom-left corner. 
@@ -22,6 +22,7 @@ class Gridworld( object ):
         self.penalty_state = np.array( [ 1, 3 ] )
         self.goal_reward = goal
         self.penalty_reward = penalty
+        self.enable_slip = enable_slip
 
         self.state = self.start_state
 
@@ -39,15 +40,16 @@ class Gridworld( object ):
             reward ( float ): reward received after taking the action
             done ( bool ): whether the episode has ended
         """
-        # Slip dynamics: 80% desired action, 10% slip right, 10% slip left
-        slip_prob = random.random()
+        if self.enable_slip:
+            # Slip dynamics: 80% desired action, 10% slip right, 10% slip left
+            slip_prob = random.random()
 
-        if slip_prob < 0.1: 
-            # Slip to the right with a 10% chance
-            action = ( action + 1 ) % 4
-        elif slip_prob < 0.2:
-            # Slip to the left with a 10% chance
-            action = ( action + 3 ) % 4
+            if slip_prob < 0.1: 
+                # Slip to the right with a 10% chance
+                action = ( action + 1 ) % 4
+            elif slip_prob < 0.2:
+                # Slip to the left with a 10% chance
+                action = ( action + 3 ) % 4
 
         state = self.state
         row, col = state
